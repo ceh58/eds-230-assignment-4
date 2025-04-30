@@ -19,7 +19,7 @@ library(ggpubr)
 library(here)
 ```
 
-# Parameters
+# Generate Parameters
 
 1. Windspeeds (v):
 
@@ -29,18 +29,16 @@ library(here)
 
 2. Vegetation height (height):
 
-- between 3.5 and 5.5 m (but any value in
-that range is equally likely)
+- between 3.5 and 5.5 m (but any value in that range is equally likely)
 
 3. k_d and k_0 parameters: 
 
 - normally distributed
 - standard deviation of 1% of their default values
 
-# Analysis 
+# Sobol Analysis 
 
-a. Use the Sobel approach to generate parameter values
-for the 4 parameters
+a. Use the Sobol approach to generate parameter values for the 4 parameters
 
 ```{r}
 #| message: false
@@ -48,7 +46,10 @@ source(here("Catm.R"))
 
 # generate two examples of random number from parameter distributions
 
+# number of samples
 np <- 1000
+
+# example 1
 k_o <- rnorm(mean = 0.1, sd = 0.1 * 0.01, n = np)
 k_d <- rnorm(mean = 0.7, sd = 0.7 * 0.01, n = np)
 # in meters/s
@@ -57,6 +58,7 @@ height <- runif(min = 3.5, max = 5.5, n = np)
 
 X1 <- cbind.data.frame(k_o, k_d, v, height = height)
 
+#example 2
 # repeat sampling
 k_o <- rnorm(mean = 0.1, sd = 0.1 * 0.01, n = np)
 k_d <- rnorm(mean = 0.7, sd = 0.7 * 0.01, n = np)
@@ -66,54 +68,48 @@ height <- runif(min = 3.5, max = 5.5, n = np)
 
 X2 <- cbind.data.frame(k_o, k_d, v, height = height)
 
-# there are different versions of sobol functions that have different approaches for estimating parameters and indices, we use an approach implemented by jansen
-
+# Use a Sobol approach implemented by jansen
 sens_Catm_Sobol <- sobolSalt(model = NULL, X1, X2, nboot = 100)
 
 #str(sens_Catm_Sobol)
+
 # Take a look at the Sobol generated sensitivity object
 # your parameters sets for sensitivity analysis are in X
-
 #sens_Catm_Sobol$X
 ```
 
-b. Run the atmospheric conductance model for these
-parameters
+b. Run the atmospheric conductance model for these parameters
 
 ```{r}
-# run model for all parameter sets
-# make sure you give the parameters names
+# Turn results into df
+parms <- as.data.frame(sens_Catm_Sobol$X) 
 
-parms <- as.data.frame(sens_Catm_Sobol$X) # turn results into df
-colnames(parms) <- colnames(X1) # give it original column names
-res <- pmap_dbl(parms, Catm) # pmap parameters to the function (run model)
+# Name the parameters 
+colnames(parms) <- colnames(X1)
 
-# length(res) == nrow(X)
+# Run model for all parameter sets
+res <- pmap_dbl(parms, Catm) 
 
+# Check
+length(res) == nrow(parms)
+
+# Supply model outputs
 sens_Catm_Sobol <- sensitivity::tell(sens_Catm_Sobol, res, res.names = "ga") 
 ```
 
-c. Plot conductance estimates in a way that accounts for
-parameter uncertainty
+c. Plot conductance estimates in a way that accounts for parameter uncertainty
 
 ```{r}
-# graph two most sensitive parameters
+# Graph two most sensitive parameters
 both <- cbind.data.frame(parms, gs = sens_Catm_Sobol$y) #gs is atmostpheric conductance (results)
 
 # look at overall gs sensitvity to uncertainty
 ggplot(both, aes(x = gs)) +
   geom_histogram() +
   geom_vline(xintercept = mean(both$gs), col = "cyan")
-
-# use second most sensitive parameter (using most important as color)
-ggplot(both, aes(k_o, gs, col = k_d)) +
-  geom_point() +
-  labs(y = "Conductance (mm/s)", x = "k_d parameter")
 ```
 
-d. Plot conductance estimates against windspeed use the
-parameter that is 2nd in terms of total effect on
-response
+d. Plot conductance estimates against windspeed use the parameter that is 2nd in terms of total effect on response
 
 ```{r}
 # look at response of conductance to the two interesting variables
@@ -126,15 +122,7 @@ ggplot(both, aes(v, gs, col = height)) +
 e. Estimate the Sobel Indices for your output
 
 ```{r}
-# quanitify Sobol indices
-# tell needs Sobel object (sens_Catm_Sobol) and results (res)
-sens_Catm_Sobol <- sensitivity::tell(sens_Catm_Sobol, res, res.names = "ga") 
-parms <- as.data.frame(sens_Catm_Sobol$X)
-colnames(parms) <- colnames(X1)
-res <- pmap_dbl(parms, Catm)
-
-sens_Catm_Sobol <- sensitivity::tell(sens_Catm_Sobol, res, res.names = "ga")
-
+# Quanitify Sobol indices
 # main effect:  partitions variance (main effect without co-variance) - sums approximately to one
 sens_Catm_Sobol$S
 # useful to add names
@@ -151,11 +139,7 @@ print(sens_Catm_Sobol)
 ```
 
 
-f. Comment on what this tells you about how
-atmospheric conductance and its sensitivity to
-variation in windspped differs in this setting as
-compared to the setting that we examined in class
-where windspeed was lower and less variable and
-vegetation was taller.
+f. Comment on what this tells you about how atmospheric conductance and its sensitivity to variation in windspeed differs in this setting as compared to the setting that we examined in class where windspeed was lower and less variable and vegetation was taller.
 
+Atmospheric conductance is *more* sensitive to windspeed in this setting (with higher, more variable windespeed and shorter vegetation) vs. the setting we examined in class (with lower, less variable windspeed and taller vegetation). We know this by comparing the Sobol indices, where the indices for v and height are higher in this setting than the class setting, where k_d was the most sensitive (highest indice) parameter. This shed light on the role of windspeed and vegetation on atmospheric conductance, specifically concerning water vapor flux, in different environments. 
 

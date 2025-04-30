@@ -114,8 +114,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="parameters" class="level1">
-<h1>Parameters</h1>
+<section id="generate-parameters" class="level1">
+<h1>Generate Parameters</h1>
 <ol type="1">
 <li>Windspeeds (v):</li>
 </ol>
@@ -138,82 +138,73 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>standard deviation of 1% of their default values</li>
 </ul>
 </section>
-<section id="analysis" class="level1">
-<h1>Analysis</h1>
+<section id="sobol-analysis" class="level1">
+<h1>Sobol Analysis</h1>
 <ol type="a">
-<li>Use the Sobel approach to generate parameter values for the 4 parameters</li>
+<li>Use the Sobol approach to generate parameter values for the 4 parameters</li>
 </ol>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">"Catm.R"</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># generate two examples of random number from parameter distributions</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>np <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>k_o <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="fl">0.1</span>, <span class="at">sd =</span> <span class="fl">0.1</span> <span class="sc">*</span> <span class="fl">0.01</span>, <span class="at">n =</span> np)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>k_d <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="fl">0.7</span>, <span class="at">sd =</span> <span class="fl">0.7</span> <span class="sc">*</span> <span class="fl">0.01</span>, <span class="at">n =</span> np)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># in meters/s</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">0.5</span>, <span class="at">n =</span> np)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>height <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">min =</span> <span class="fl">3.5</span>, <span class="at">max =</span> <span class="fl">5.5</span>, <span class="at">n =</span> np)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>X1 <span class="ot">&lt;-</span> <span class="fu">cbind.data.frame</span>(k_o, k_d, v, <span class="at">height =</span> height)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># repeat sampling</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>k_o <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="fl">0.1</span>, <span class="at">sd =</span> <span class="fl">0.1</span> <span class="sc">*</span> <span class="fl">0.01</span>, <span class="at">n =</span> np)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>k_d <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="fl">0.7</span>, <span class="at">sd =</span> <span class="fl">0.7</span> <span class="sc">*</span> <span class="fl">0.01</span>, <span class="at">n =</span> np)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># in meters/s</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">0.5</span>, <span class="at">n =</span> np)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>height <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">min =</span> <span class="fl">3.5</span>, <span class="at">max =</span> <span class="fl">5.5</span>, <span class="at">n =</span> np)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>X2 <span class="ot">&lt;-</span> <span class="fu">cbind.data.frame</span>(k_o, k_d, v, <span class="at">height =</span> height)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># there are different versions of sobol functions that have different approaches for estimating parameters and indices, we use an approach implemented by jansen</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># number of samples</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>np <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># example 1</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>k_o <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="fl">0.1</span>, <span class="at">sd =</span> <span class="fl">0.1</span> <span class="sc">*</span> <span class="fl">0.01</span>, <span class="at">n =</span> np)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>k_d <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="fl">0.7</span>, <span class="at">sd =</span> <span class="fl">0.7</span> <span class="sc">*</span> <span class="fl">0.01</span>, <span class="at">n =</span> np)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># in meters/s</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">0.5</span>, <span class="at">n =</span> np)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>height <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">min =</span> <span class="fl">3.5</span>, <span class="at">max =</span> <span class="fl">5.5</span>, <span class="at">n =</span> np)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>X1 <span class="ot">&lt;-</span> <span class="fu">cbind.data.frame</span>(k_o, k_d, v, <span class="at">height =</span> height)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#example 2</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># repeat sampling</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>k_o <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="fl">0.1</span>, <span class="at">sd =</span> <span class="fl">0.1</span> <span class="sc">*</span> <span class="fl">0.01</span>, <span class="at">n =</span> np)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>k_d <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="fl">0.7</span>, <span class="at">sd =</span> <span class="fl">0.7</span> <span class="sc">*</span> <span class="fl">0.01</span>, <span class="at">n =</span> np)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># in meters/s</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">0.5</span>, <span class="at">n =</span> np)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>height <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">min =</span> <span class="fl">3.5</span>, <span class="at">max =</span> <span class="fl">5.5</span>, <span class="at">n =</span> np)</span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol <span class="ot">&lt;-</span> <span class="fu">sobolSalt</span>(<span class="at">model =</span> <span class="cn">NULL</span>, X1, X2, <span class="at">nboot =</span> <span class="dv">100</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>X2 <span class="ot">&lt;-</span> <span class="fu">cbind.data.frame</span>(k_o, k_d, v, <span class="at">height =</span> height)</span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(sens_Catm_Sobol)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>List of 8
- $ model : NULL
- $ X1    : num [1:1000, 1:4] 0.1 0.1006 0.0995 0.0992 0.1012 ...
-  ..- attr(*, "dimnames")=List of 2
-  .. ..$ : NULL
-  .. ..$ : NULL
- $ X2    : num [1:1000, 1:4] 0.1005 0.0998 0.1012 0.0998 0.1017 ...
-  ..- attr(*, "dimnames")=List of 2
-  .. ..$ : NULL
-  .. ..$ : NULL
- $ scheme: chr "A"
- $ nboot : num 100
- $ conf  : num 0.95
- $ X     : num [1:6000, 1:4] 0.1 0.1006 0.0995 0.0992 0.1012 ...
- $ call  : language sobolSalt(model = NULL, X1 = X1, X2 = X2, nboot = 100)
- - attr(*, "class")= chr "sobolSalt"</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Take a look at the Sobol generated sensitivity object</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># your parameters sets for sensitivity analysis are in X</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#sens_Catm_Sobol$X</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a Sobol approach implemented by jansen</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol <span class="ot">&lt;-</span> <span class="fu">sobolSalt</span>(<span class="at">model =</span> <span class="cn">NULL</span>, X1, X2, <span class="at">nboot =</span> <span class="dv">100</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#str(sens_Catm_Sobol)</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Take a look at the Sobol generated sensitivity object</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co"># your parameters sets for sensitivity analysis are in X</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#sens_Catm_Sobol$X</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol start="2" type="a">
 <li>Run the atmospheric conductance model for these parameters</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run model for all parameter sets</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># make sure you give the parameters names</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(sens_Catm_Sobol<span class="sc">$</span>X) <span class="co"># turn results into df</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(parms) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(X1) <span class="co"># give it original column names</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">pmap_dbl</span>(parms, Catm) <span class="co"># pmap parameters to the function (run model)</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># length(res) == nrow(X)</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol <span class="ot">&lt;-</span> sensitivity<span class="sc">::</span><span class="fu">tell</span>(sens_Catm_Sobol, res, <span class="at">res.names =</span> <span class="st">"ga"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Turn results into df</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(sens_Catm_Sobol<span class="sc">$</span>X) </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Name the parameters </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(parms) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(X1)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Run model for all parameter sets</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">pmap_dbl</span>(parms, Catm) </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(res) <span class="sc">==</span> <span class="fu">nrow</span>(parms)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Supply model outputs</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol <span class="ot">&lt;-</span> sensitivity<span class="sc">::</span><span class="fu">tell</span>(sens_Catm_Sobol, res, <span class="at">res.names =</span> <span class="st">"ga"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol start="3" type="a">
 <li>Plot conductance estimates in a way that accounts for parameter uncertainty</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># graph two most sensitive parameters</span></span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Graph two most sensitive parameters</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>both <span class="ot">&lt;-</span> <span class="fu">cbind.data.frame</span>(parms, <span class="at">gs =</span> sens_Catm_Sobol<span class="sc">$</span>y) <span class="co">#gs is atmostpheric conductance (results)</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># look at overall gs sensitvity to uncertainty</span></span>
@@ -230,27 +221,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use second most sensitive parameter (using most important as color)</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(both, <span class="fu">aes</span>(k_o, gs, <span class="at">col =</span> k_d)) <span class="sc">+</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Conductance (mm/s)"</span>, <span class="at">x =</span> <span class="st">"k_d parameter"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="eds-230-assignment-4_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
 </div>
 <ol start="4" type="a">
 <li>Plot conductance estimates against windspeed use the parameter that is 2nd in terms of total effect on response</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># look at response of conductance to the two interesting variables</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(both, <span class="fu">aes</span>(v, gs, <span class="at">col =</span> height)) <span class="sc">+</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># conductance as a function of windspeed (height isnt making much diff i.e. color)</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Conductance (mm/s)"</span>, <span class="at">x =</span> <span class="st">"Windspeed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># look at response of conductance to the two interesting variables</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(both, <span class="fu">aes</span>(v, gs, <span class="at">col =</span> height)) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># conductance as a function of windspeed (height isnt making much diff i.e. color)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Conductance (mm/s)"</span>, <span class="at">x =</span> <span class="st">"Windspeed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -263,47 +243,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Estimate the Sobel Indices for your output</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># quanitify Sobol indices</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># tell needs Sobel object (sens_Catm_Sobol) and results (res)</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol <span class="ot">&lt;-</span> sensitivity<span class="sc">::</span><span class="fu">tell</span>(sens_Catm_Sobol, res, <span class="at">res.names =</span> <span class="st">"ga"</span>) </span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(sens_Catm_Sobol<span class="sc">$</span>X)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(parms) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(X1)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">pmap_dbl</span>(parms, Catm)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol <span class="ot">&lt;-</span> sensitivity<span class="sc">::</span><span class="fu">tell</span>(sens_Catm_Sobol, res, <span class="at">res.names =</span> <span class="st">"ga"</span>)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># main effect:  partitions variance (main effect without co-variance) - sums approximately to one</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol<span class="sc">$</span>S</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quanitify Sobol indices</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># main effect:  partitions variance (main effect without co-variance) - sums approximately to one</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol<span class="sc">$</span>S</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      original         bias  std. error   min. c.i.     max. c.i.
-X1 -0.05562486  0.002372355 0.029020244 -0.11581222 -3.484905e-03
-X2 -0.05290930  0.002161520 0.029077753 -0.11339490 -8.280927e-06
-X3  0.82278258 -0.001354740 0.009875473  0.80438737  8.455752e-01
-X4  0.12665021  0.002008013 0.029164484  0.07281016  1.894914e-01</code></pre>
+<pre><code>      original         bias std. error   min. c.i.  max. c.i.
+X1 -0.02121483  0.003096130 0.02666028 -0.07541446 0.03656416
+X2 -0.02709480  0.003130264 0.02704222 -0.08325828 0.03111972
+X3  0.81051824 -0.001455986 0.01035796  0.79159805 0.83329670
+X4  0.14539367  0.004370470 0.02395953  0.08817240 0.18661407</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># useful to add names</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">row.names</span>(sens_Catm_Sobol<span class="sc">$</span>S) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(parms)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol<span class="sc">$</span>S <span class="co"># S is the main effect</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># useful to add names</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">row.names</span>(sens_Catm_Sobol<span class="sc">$</span>S) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(parms)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol<span class="sc">$</span>S <span class="co"># S is the main effect</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>          original         bias  std. error   min. c.i.     max. c.i.
-k_o    -0.05562486  0.002372355 0.029020244 -0.11581222 -3.484905e-03
-k_d    -0.05290930  0.002161520 0.029077753 -0.11339490 -8.280927e-06
-v       0.82278258 -0.001354740 0.009875473  0.80438737  8.455752e-01
-height  0.12665021  0.002008013 0.029164484  0.07281016  1.894914e-01</code></pre>
+<pre><code>          original         bias std. error   min. c.i.  max. c.i.
+k_o    -0.02121483  0.003096130 0.02666028 -0.07541446 0.03656416
+k_d    -0.02709480  0.003130264 0.02704222 -0.08325828 0.03111972
+v       0.81051824 -0.001455986 0.01035796  0.79159805 0.83329670
+height  0.14539367  0.004370470 0.02395953  0.08817240 0.18661407</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># total effect - accounts for parameter interactions</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">row.names</span>(sens_Catm_Sobol<span class="sc">$</span>T) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(parms)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol<span class="sc">$</span>T <span class="co"># T is the total effect</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># total effect - accounts for parameter interactions</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">row.names</span>(sens_Catm_Sobol<span class="sc">$</span>T) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(parms)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>sens_Catm_Sobol<span class="sc">$</span>T <span class="co"># T is the total effect</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>          original         bias   std. error   min. c.i.   max. c.i.
-k_o    0.003263279 3.147765e-05 0.0002264582 0.002792404 0.003664753
-k_d    0.003092263 3.463295e-05 0.0002083179 0.002578294 0.003468621
-v      0.868355589 5.814341e-04 0.0304940850 0.806995316 0.931761347
-height 0.190971419 1.733955e-03 0.0107285419 0.167114578 0.211032229</code></pre>
+<pre><code>          original          bias   std. error   min. c.i.   max. c.i.
+k_o    0.002825125  3.026405e-05 0.0001979290 0.002407962 0.003150414
+k_d    0.002705079  1.169061e-06 0.0001896611 0.002230920 0.003066788
+v      0.853469895 -1.969043e-03 0.0276635749 0.807508629 0.919741719
+height 0.165786083  1.494173e-03 0.0094864094 0.144228035 0.186196830</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Both the main effect and total effect can tell us something about how the parameter influences results</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(sens_Catm_Sobol)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Both the main effect and total effect can tell us something about how the parameter influences results</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(sens_Catm_Sobol)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -311,26 +283,27 @@ sobolSalt(model = NULL, X1 = X1, X2 = X2, nboot = 100)
 
 Model runs: 6000 
 
-Model variance: 521.1327 
+Model variance: 462.047 
 
 First order indices:
-          original         bias  std. error   min. c.i.     max. c.i.
-k_o    -0.05562486  0.002372355 0.029020244 -0.11581222 -3.484905e-03
-k_d    -0.05290930  0.002161520 0.029077753 -0.11339490 -8.280927e-06
-v       0.82278258 -0.001354740 0.009875473  0.80438737  8.455752e-01
-height  0.12665021  0.002008013 0.029164484  0.07281016  1.894914e-01
+          original         bias std. error   min. c.i.  max. c.i.
+k_o    -0.02121483  0.003096130 0.02666028 -0.07541446 0.03656416
+k_d    -0.02709480  0.003130264 0.02704222 -0.08325828 0.03111972
+v       0.81051824 -0.001455986 0.01035796  0.79159805 0.83329670
+height  0.14539367  0.004370470 0.02395953  0.08817240 0.18661407
 
 Total indices:
-          original         bias   std. error   min. c.i.   max. c.i.
-k_o    0.003263279 3.147765e-05 0.0002264582 0.002792404 0.003664753
-k_d    0.003092263 3.463295e-05 0.0002083179 0.002578294 0.003468621
-v      0.868355589 5.814341e-04 0.0304940850 0.806995316 0.931761347
-height 0.190971419 1.733955e-03 0.0107285419 0.167114578 0.211032229</code></pre>
+          original          bias   std. error   min. c.i.   max. c.i.
+k_o    0.002825125  3.026405e-05 0.0001979290 0.002407962 0.003150414
+k_d    0.002705079  1.169061e-06 0.0001896611 0.002230920 0.003066788
+v      0.853469895 -1.969043e-03 0.0276635749 0.807508629 0.919741719
+height 0.165786083  1.494173e-03 0.0094864094 0.144228035 0.186196830</code></pre>
 </div>
 </div>
 <ol start="6" type="a">
-<li>Comment on what this tells you about how atmospheric conductance and its sensitivity to variation in windspped differs in this setting as compared to the setting that we examined in class where windspeed was lower and less variable and vegetation was taller.</li>
+<li>Comment on what this tells you about how atmospheric conductance and its sensitivity to variation in windspeed differs in this setting as compared to the setting that we examined in class where windspeed was lower and less variable and vegetation was taller.</li>
 </ol>
+<p>Atmospheric conductance is <em>more</em> sensitive to windspeed in this setting (with higher, more variable windespeed and shorter vegetation) vs.&nbsp;the setting we examined in class (with lower, less variable windspeed and taller vegetation). We know this by comparing the Sobol indices, where the indices for v and height are higher in this setting than the class setting, where k_d was the most sensitive (highest indice) parameter. This shed light on the role of windspeed and vegetation on atmospheric conductance, specifically concerning water vapor flux, in different environments.</p>
 </section>
 
 </main>
